@@ -124,6 +124,7 @@ function pickBestError(errors: any[]): any {
  * Ranks different error codes by priority.
  */
 function rankError(error: any) {
+  if (error == null) return -1
   if (error.name === errorNames.InsufficientFundsError) return 5
   if (error.name === errorNames.PendingFundsError) return 5
   if (error.name === errorNames.SwapBelowLimitError) return 4
