@@ -35,15 +35,15 @@ export type LobbySubscription = { unsubscribe(): mixed }
 export type LobbyInstance = {
   lobbyId: string,
   subscribe(
-    onReply: (reply: mixed) => mixed,
-    onError: (e: Error) => mixed
+    onReply: (reply: mixed) => void,
+    onError: (e: Error) => void
   ): LobbySubscription
 }
 
 /**
  * Derives a shared secret from the given secret key and public key.
  */
-function deriveSharedKey(keypair: Keypair, pubkey: Uint8Array) {
+function deriveSharedKey(keypair: Keypair, pubkey: Uint8Array): Uint8Array {
   const secretX = keypair
     .derive(secp256k1.keyFromPublic(pubkey).getPublic())
     .toArray('be')
@@ -75,7 +75,7 @@ export function encryptLobbyReply(
   io: EdgeIo,
   pubkey: Uint8Array,
   replyData: mixed
-) {
+): LobbyReply {
   const keypair = secp256k1.genKeyPair({ entropy: io.random(32) })
   const sharedKey = deriveSharedKey(keypair, pubkey)
   return {
@@ -118,7 +118,10 @@ class ObservableLobby {
     this.onReply = undefined
   }
 
-  subscribe(onReply: (reply: mixed) => mixed, onError: (e: Error) => mixed) {
+  subscribe(
+    onReply: (reply: mixed) => void,
+    onError: (e: Error) => void
+  ): LobbySubscription {
     this.onReply = onReply
     this.onError = onError
     this.replyCount = 0
@@ -192,7 +195,10 @@ export function makeLobby(
  * Fetches a lobby request from the auth server.
  * @return A promise of the lobby request JSON.
  */
-export function fetchLobbyRequest(ai: ApiInput, lobbyId: string) {
+export function fetchLobbyRequest(
+  ai: ApiInput,
+  lobbyId: string
+): Promise<LobbyRequest> {
   return loginFetch(ai, 'GET', '/v2/lobby/' + lobbyId, {}).then(reply => {
     const lobbyRequest = reply.request
 
@@ -217,7 +223,7 @@ export function sendLobbyReply(
   lobbyId: string,
   lobbyRequest: LobbyRequest,
   replyData: mixed
-) {
+): Promise<void> {
   const { io } = ai.props
   if (lobbyRequest.publicKey == null) {
     throw new TypeError('The lobby data does not have a public key')
@@ -227,6 +233,6 @@ export function sendLobbyReply(
     data: encryptLobbyReply(io, pubkey, replyData)
   }
   return loginFetch(ai, 'POST', '/v2/lobby/' + lobbyId, request).then(
-    reply => null
+    () => undefined
   )
 }

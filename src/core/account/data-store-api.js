@@ -1,6 +1,11 @@
 // @flow
 
-import { mapFiles, mapFolders } from 'disklet'
+import {
+  type DiskletFile,
+  type DiskletFolder,
+  mapFiles,
+  mapFolders
+} from 'disklet'
 import { bridgifyObject } from 'yaob'
 
 import {
@@ -14,7 +19,10 @@ import {
   hashStorageWalletFilename
 } from '../storage/storage-selectors.js'
 
-function getPluginsFolder(ai: ApiInput, accountWalletInfo: EdgeWalletInfo) {
+function getPluginsFolder(
+  ai: ApiInput,
+  accountWalletInfo: EdgeWalletInfo
+): DiskletFolder {
   const folder = getStorageWalletFolder(ai.props.state, accountWalletInfo.id)
   return folder.folder('Plugins')
 }
@@ -23,7 +31,7 @@ function getPluginFolder(
   ai: ApiInput,
   accountWalletInfo: EdgeWalletInfo,
   storeId: string
-) {
+): DiskletFolder {
   const folder = getPluginsFolder(ai, accountWalletInfo)
   return folder.folder(
     hashStorageWalletFilename(ai.props.state, accountWalletInfo.id, storeId)
@@ -35,7 +43,7 @@ function getPluginFile(
   accountWalletInfo: EdgeWalletInfo,
   storeId: string,
   itemId: string
-) {
+): DiskletFile {
   const folder = getPluginFolder(ai, accountWalletInfo, storeId)
   return folder.file(
     hashStorageWalletFilename(ai.props.state, accountWalletInfo.id, itemId) +

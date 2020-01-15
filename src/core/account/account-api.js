@@ -48,6 +48,7 @@ import { type ApiInput } from '../root-pixie.js'
 import { makeStorageWalletApi } from '../storage/storage-api.js'
 import { fetchSwapQuote } from '../swap/swap-api.js'
 import { changeWalletStates } from './account-files.js'
+import { type AccountState } from './account-reducer.js'
 import { makeDataStoreApi, makePluginDataApi } from './data-store-api.js'
 import { makeLobbyApi } from './lobby-api.js'
 import { CurrencyConfig, SwapConfig } from './plugin-api.js'
@@ -56,7 +57,7 @@ import { CurrencyConfig, SwapConfig } from './plugin-api.js'
  * Creates an unwrapped account API object around an account state object.
  */
 export function makeAccountApi(ai: ApiInput, accountId: string): EdgeAccount {
-  const selfState = () => ai.props.state.accounts[accountId]
+  const selfState = (): AccountState => ai.props.state.accounts[accountId]
   const { accountWalletInfo, loginType, loginTree } = selfState()
   const { username } = loginTree
 
@@ -78,7 +79,7 @@ export function makeAccountApi(ai: ApiInput, accountId: string): EdgeAccount {
   const pluginData = makePluginDataApi(dataStore)
   const storageWalletApi = makeStorageWalletApi(ai, accountWalletInfo)
 
-  function lockdown() {
+  function lockdown(): void {
     if (ai.props.state.hideKeys) {
       throw new Error('Not available when `hideKeys` is enabled')
     }
@@ -310,15 +311,15 @@ export function makeAccountApi(ai: ApiInput, accountId: string): EdgeAccount {
     },
     async waitForCurrencyWallet(walletId: string): Promise<EdgeCurrencyWallet> {
       return new Promise(resolve => {
-        const f = () => {
-          const wallet = this.currencyWallets[walletId]
+        function check(): void {
+          const wallet = out.currencyWallets[walletId]
           if (wallet != null) {
             resolve(wallet)
             unsubscribe()
           }
         }
-        const unsubscribe = this.watch('currencyWallets', f)
-        f()
+        const unsubscribe = out.watch('currencyWallets', check)
+        check()
       })
     },
 
