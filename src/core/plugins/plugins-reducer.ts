@@ -40,6 +40,7 @@ export const plugins = (
         rate: { ...state.rate },
         swap: { ...state.swap }
       }
+<<<<<<< HEAD
       for (const pluginId in action.payload) {
         const plugin = action.payload[pluginId]
         // $FlowFixMe - Flow doesn't see the type refinement here:
@@ -48,6 +49,13 @@ export const plugins = (
         if (plugin.rateInfo != null) out.rate[pluginId] = plugin
         // $FlowFixMe
         if (plugin.swapInfo != null) out.swap[pluginId] = plugin
+=======
+      for (const pluginName in action.payload) {
+        const plugin = action.payload[pluginName]
+        if ('currencyInfo' in plugin) out.currency[pluginName] = plugin
+        if ('rateInfo' in plugin) out.rate[pluginName] = plugin
+        if ('swapInfo' in plugin) out.swap[pluginName] = plugin
+>>>>>>> 0a77a8e7... Fix remaining type errors
       }
       return out
     }

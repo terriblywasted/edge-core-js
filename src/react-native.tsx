@@ -1,5 +1,5 @@
 import { makeReactNativeDisklet } from 'disklet'
-import React, { Element } from 'react'
+import React from 'react'
 
 import { parseReply } from './core/login/login-fetch'
 import { EdgeCoreBridge } from './io/react-native/react-native-webview'
@@ -32,7 +32,7 @@ export function MakeEdgeContext(props: {
   onError?: (e: any) => unknown
   onLoad: (context: EdgeContext) => unknown
   options: EdgeContextOptions
-}): Element<any> {
+}): React.ReactElement {
   const { debug, nativeIo, onError = onErrorDefault, onLoad } = props
   if (onLoad == null) {
     throw new TypeError('No onLoad passed to MakeEdgeContext')
@@ -56,7 +56,7 @@ export function MakeFakeEdgeWorld(props: {
   onError?: (e: any) => unknown
   onLoad: (world: EdgeFakeWorld) => unknown
   users?: EdgeFakeUser[]
-}): Element<any> {
+}): React.ReactElement {
   const { debug, nativeIo, onError = onErrorDefault, onLoad } = props
   if (onLoad == null) {
     throw new TypeError('No onLoad passed to MakeFakeEdgeWorld')
